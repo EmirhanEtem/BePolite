@@ -1,0 +1,13 @@
+apiVersion: v2
+name: neighbornet-backend
+description: NeighborNet Backend Helm Chart
+type: application
+version: 1.0.0
+appVersion: 1.0.0
+keywords:
+  - neighbornet
+  - backend
+  - api
+maintainers:
+  - name: NeighborNet Team
+    email: team@neighbornet.local

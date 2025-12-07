@@ -1,0 +1,120 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  phone     String   @unique
+  email     String?  @unique
+  passwordHash String
+  trustScore Int     @default(100)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  devices              Device[]
+  providerAvailability ProviderAvailability[]
+  providerSessions     ProviderSession[] @relation("Provider")
+  requesterSessions    ProviderSession[] @relation("Requester")
+  speedTests           SpeedTest[]
+  refreshTokens        RefreshToken[]
+
+  @@index([phone])
+  @@index([email])
+}
+
+model Device {
+  id                String   @id @default(cuid())
+  userId            String
+  deviceFingerprint String   @unique
+  lastSeen          DateTime @default(now())
+  batteryLevel      Float    @default(100.0)
+  connectionType    String   @default("4G") // 4G, 5G, WiFi, etc.
+  bandwidthEstimate Float    @default(0.0)
+  latitude          Float?
+  longitude         Float?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user                 User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  providerAvailability ProviderAvailability?
+  providerSessions     ProviderSession[] @relation("ProviderDevice")
+  requesterSessions    ProviderSession[] @relation("RequesterDevice")
+  speedTests           SpeedTest[]
+
+  @@index([userId])
+  @@index([deviceFingerprint])
+  @@index([latitude, longitude])
+}
+
+model ProviderAvailability {
+  id              String   @id @default(cuid())
+  deviceId        String   @unique
+  isAvailable     Boolean  @default(false)
+  hotspotEnabled  Boolean  @default(false)
+  estimatedSpeed  Float    @default(0.0) // Mbps
+  maxShareMbps    Float    @default(0.0)
+  updatedAt       DateTime @default(now())
+
+  device Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  userId String @db.Text
+
+  @@index([deviceId])
+  @@index([isAvailable])
+}
+
+model ProviderSession {
+  id                 String   @id @default(cuid())
+  providerDeviceId   String
+  requesterDeviceId  String
+  providerUserId     String
+  requesterUserId    String
+  startTime          DateTime @default(now())
+  endTime            DateTime?
+  totalBytesShared   BigInt   @default(0)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  providerDevice  Device @relation("ProviderDevice", fields: [providerDeviceId], references: [id], onDelete: Cascade)
+  requesterDevice Device @relation("RequesterDevice", fields: [requesterDeviceId], references: [id], onDelete: Cascade)
+  providerUser    User   @relation("Provider", fields: [providerUserId], references: [id], onDelete: Cascade)
+  requesterUser   User   @relation("Requester", fields: [requesterUserId], references: [id], onDelete: Cascade)
+
+  @@index([providerDeviceId])
+  @@index([requesterDeviceId])
+  @@index([startTime])
+}
+
+model SpeedTest {
+  id           String   @id @default(cuid())
+  deviceId     String
+  uploadMbps   Float
+  downloadMbps Float
+  latencyMs    Int
+  timestamp    DateTime @default(now())
+
+  device Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+
+  @@index([deviceId])
+  @@index([timestamp])
+}
+
+model RefreshToken {
+  id           String   @id @default(cuid())
+  userId       String
+  tokenVersion Int      @default(1)
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}

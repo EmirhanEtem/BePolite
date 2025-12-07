@@ -1,0 +1,62 @@
+{
+  "name": "neighbornet-backend",
+  "version": "1.0.0",
+  "description": "NeighborNet Backend - Distributed Internet Sharing Service API",
+  "main": "dist/server.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node --loader ts-node/esm src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:studio": "prisma studio",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "lint": "eslint src --ext .ts",
+    "format": "prettier --write src",
+    "docker:build": "docker build -t neighbornet-backend:latest .",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down"
+  },
+  "keywords": [
+    "neighbornet",
+    "internet-sharing",
+    "wifi",
+    "fastify",
+    "websocket"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@fastify/cors": "8.4.0",
+    "@fastify/helmet": "11.1.1",
+    "@fastify/rate-limit": "8.1.0",
+    "@fastify/websocket": "7.1.2",
+    "@prisma/client": "5.4.1",
+    "bcrypt": "5.1.1",
+    "dotenv": "16.3.1",
+    "fastify": "4.24.3",
+    "jsonwebtoken": "9.0.2",
+    "pino": "8.16.2",
+    "pino-pretty": "10.2.3",
+    "zod": "3.22.4"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/jsonwebtoken": "^9.0.7",
+    "@types/node": "^20.10.6",
+    "@typescript-eslint/eslint-plugin": "^6.17.0",
+    "@typescript-eslint/parser": "^6.17.0",
+    "@vitest/ui": "^1.1.0",
+    "eslint": "^8.56.0",
+    "prettier": "^3.1.1",
+    "prisma": "5.4.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3",
+    "vitest": "^1.1.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
